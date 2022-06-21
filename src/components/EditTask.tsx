@@ -4,56 +4,49 @@ import {useNavigate} from "react-router-dom";
 import {useAppDispatch, useAppSelector} from "../hooks/redux";
 import {ITask} from "../models/ITask";
 import {tasksActions} from '../store/actions'
+import {ICategory} from "../models/ICategory";
+
 type Params = {
     taskId: string;
 };
-const initialState : ITask = {
-    taskId: Math.random()*100000,
+const initialState: ITask = {
+    taskId: Math.random() * 100000,
     taskName: '',
     dueDate: new Date(),
     doneDate: new Date(),
-    isDone:false,
+    isDone: false,
     categoryId: 0
 }
 const EditTask = () => {
     const {taskId} = useParams<Params>();
-    let taskIdNumber : number = Number(taskId);
+    let taskIdNumber: number = Number(taskId);
     const dispatch = useAppDispatch();
-    // @ts-ignore
-    const task = useAppSelector(state => state.tasks['tasks'].find(
-        (task : ITask) => task.taskId === taskIdNumber));
+    const tasks : ITask [] = useAppSelector(state => state.tasks['tasks']);
+    const task : ITask = tasks.find(
+        (task: ITask) => task.taskId === taskIdNumber) as ITask;
     const [taskData, setTaskData] = useState<ITask>(initialState);
     const navigate = useNavigate();
     useEffect(() => {
-        if(task !== undefined){
+        if (task !== undefined) {
             setTaskData(task);
         }
-    },[])
-    // @ts-ignore
-    const renderedCategories = useAppSelector(state=> state.categories['categories'].map(category => (
-        <option value={category.categoryId} key={category.categoryId}>{category.categoryName}</option>
-    )))
-    const handleChange = (event: ChangeEvent<HTMLInputElement>) : void  => {
-        const {name , value} = event.target;
-        if(taskData !== undefined)
+    }, [])
+    const categories: ICategory[] = useAppSelector(state => state.categories['categories']);
+    const renderedCategories = categories.map(category => (
+        <option value={category.categoryId} key={category.categoryId}>{category.categoryName}</option>));
+    const handleChange = (event: ChangeEvent<HTMLInputElement>): void => {
+        const {name, value} = event.target;
+        if (taskData !== undefined)
             setTaskData({...taskData, [name]: value});
     }
-    const handleSelectChange = (e: ChangeEvent<HTMLSelectElement>) : void => {
-        const {name, value} = e.target;
-        if(taskData !== undefined)
-            setTaskData({
-                ...taskData,
-                [name] : value
-            })
-    }
-    const handleSubmit = (e : FormEvent<HTMLFormElement>) => {
+    const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        if(taskData !== undefined) {
+        if (taskData !== undefined) {
             dispatch(
                 tasksActions.fetchEditTask({...taskData})
             )
         }
-        setTimeout(() => navigate('/'),1000)
+        setTimeout(() => navigate('/'), 1000)
     }
     return (
         <div>

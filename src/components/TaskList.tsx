@@ -1,13 +1,10 @@
-import React, {ChangeEvent, FormEvent, useState} from 'react';
+import React, {FormEvent, useState} from 'react';
 import {ITask} from "../models/ITask";
 import Task from "./Task";
 import {useAppDispatch, useAppSelector} from "../hooks/redux";
 import {ICategory} from "../models/ICategory";
 import {exactCategoryActions} from '../store/actions'
-interface InitialStateInterface {
-    exactCategoryChoosen: string,
-    categoryId: number;
-}
+
 
 const TaskList = () => {
     const dispatch = useAppDispatch();
@@ -19,8 +16,8 @@ const TaskList = () => {
         if (state.exactCategory['categoryId'] === 0) {
             return state.tasks['tasks'];
         } else {
-            // @ts-ignore
-            return state.tasks['tasks'].filter((task) => task.categoryId === exactCategoryId);
+            let tasks: ITask[] = state.tasks['tasks'];
+            return tasks.filter((task) => task.categoryId === exactCategoryId);
         }
     });
     renderedDoneTasks = tasks.filter(task => task.isDone === true).map(task => (

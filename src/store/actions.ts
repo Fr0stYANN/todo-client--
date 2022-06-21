@@ -12,9 +12,9 @@ export const tasksActions = {
         type: 'REMOVE_TASK',
         payload: taskId
     } as const),
-    taskSetDone: (taskId: number, date:string) => ({
+    taskSetDone: (neededPayload: {taskId: number, date:string}) => ({
         type: 'TASK_SET_DONE',
-        payload: taskId, date
+        payload: neededPayload
     } as const),
     fetchSetTaskDone: (taskId: number) => ({
         type: 'FETCH_SET_TASK_DONE',
@@ -47,7 +47,7 @@ export const tasksActions = {
     fetchCreateTask: (task: TaskInputType) => ({
         type: 'FETCH_CREATE_TASK',
         payload: task
-    })
+    } as const),
 }
 
 export const categoryActions = {
@@ -84,7 +84,20 @@ export const categoryActions = {
         payload:category
     } as const)
 }
-
+export const dataProviderActions = {
+    fetchChangeDataProvider: (providerName: string) => ({
+        type: 'FETCH_CHANGE_DATA_PROVIDER',
+        payload:providerName
+    } as const),
+    fetchDataProvider: () => ({
+        type: 'FETCH_DATA_PROVIDER',
+        payload: null
+    } as const),
+    setDataProvider: (providerNameToChange: string) => ({
+        type: 'SET_DATA_PROVIDER',
+        payload: providerNameToChange
+    } as const)
+}
 export const exactCategoryActions = {
     exactCategoryChanged : (categoryId: number) => ({
     type: 'CHANGE_EXACT_CATEGORY',
@@ -98,3 +111,5 @@ export type CategoryActionCreatorType = ValueOf<typeof categoryActions>
 export type CategoryActionTypes = ReturnType<CategoryActionCreatorType>
 export type exactCategoryActionCreatorType = ValueOf<typeof exactCategoryActions>
 export type exactCategoryActionTypes = ReturnType<exactCategoryActionCreatorType>
+export type dataProviderActionCreatorType = ValueOf<typeof dataProviderActions>
+export type dataProviderActionTypes = ReturnType<dataProviderActionCreatorType>

@@ -2,10 +2,11 @@ import {Epic, ofType} from "redux-observable";
 import {categoryActions} from "../../store/actions";
 import {RootState} from "../../store/store";
 import {GET_ALL_CATEGORIES_QUERY} from "../tasks-management/categoriesQueries";
-import {from, mergeMap} from "rxjs";
+import {filter, from, mergeMap} from "rxjs";
 import { ICategory } from "../../models/ICategory";
-// @ts-ignore
-export const getCategoriesEpic: Epic<ReturnType<categoryActions.getAllCategories>, any, RootState> = (action$, state$) => {
+
+
+export const getCategoriesEpic: Epic<ReturnType<typeof categoryActions.getAllCategories>, any, RootState> = (action$, state$) => {
     return action$.pipe(
         ofType('GET_ALL_CATEGORIES'),
         mergeMap(action =>
@@ -24,8 +25,8 @@ export const getCategoriesEpic: Epic<ReturnType<categoryActions.getAllCategories
         ))
 }
 
-// @ts-ignore
-export const deleteCategoryEpic: Epic<ReturnType<categoryActions.fetchDeleteCategory>, any, RootState> = (action$, state$) => {
+
+export const deleteCategoryEpic: Epic<ReturnType<typeof categoryActions.fetchDeleteCategory>, any, RootState> = (action$, state$) => {
     return action$.pipe(
         ofType('FETCH_DELETE_CATEGORY'),
         mergeMap(action =>
@@ -51,8 +52,8 @@ export const deleteCategoryEpic: Epic<ReturnType<categoryActions.fetchDeleteCate
     )
 }
 
-// @ts-ignore
-export const editCategoryEpic: Epic<ReturnType<categoryActions.fetchEditCategory>, any, RootState> = (action$, state$) => {
+
+export const editCategoryEpic: Epic<ReturnType<typeof categoryActions.fetchEditCategory>, any, RootState> = (action$, state$) => {
     return action$.pipe(
         ofType('FETCH_EDIT_CATEGORY'),
         mergeMap(action =>
@@ -78,8 +79,8 @@ export const editCategoryEpic: Epic<ReturnType<categoryActions.fetchEditCategory
         )
     )
 }
-    // @ts-ignore
-export const addCategoryEpic: Epic<ReturnType<categoryActions.fetchAddCategory>, any, RootState> = (action$, state$) => {
+
+export const addCategoryEpic: Epic<ReturnType<typeof categoryActions.fetchAddCategory>, any, RootState> = (action$, state$) => {
         return action$.pipe(
             ofType('FETCH_ADD_CATEGORY'),
             mergeMap(action =>

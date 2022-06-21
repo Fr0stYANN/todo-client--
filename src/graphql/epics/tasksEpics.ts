@@ -1,14 +1,14 @@
 import {Epic, ofType} from 'redux-observable'
 import {RootState} from "../../store/store";
-import {from, map, mergeMap} from "rxjs";
+import {filter, from, map, mergeMap} from "rxjs";
 import {GET_COMPLETED_TASKS_QUERY, GET_NOT_COMPLETED_TASKS_QUERY} from "../tasks-management/tasksQueries";
 import {tasksActions} from '../../store/actions'
 import {ITask} from "../../models/ITask";
 import {TaskInputType} from "../../models/TaskInputType";
 
 
-// @ts-ignore
-export const getCompletedTasksEpic: Epic<ReturnType<tasksActions.getCompletedTasks>, any, RootState> = (action$, state$) => {
+
+export const getCompletedTasksEpic: Epic<ReturnType<typeof tasksActions.getCompletedTasks>, any, RootState> = (action$, state$) => {
     return action$.pipe(
         ofType('GET_COMPLETED_TASKS'),
         mergeMap(action =>
@@ -21,12 +21,11 @@ export const getCompletedTasksEpic: Epic<ReturnType<tasksActions.getCompletedTas
                     query: GET_COMPLETED_TASKS_QUERY
                 }),
             }).then((res) => res.json())
-               .then(result => tasksActions.setTasks(result.data.tasks.completedTasks as ITask[])))
+                .then(result => tasksActions.setTasks(result.data.tasks.completedTasks as ITask[])))
         )
     );
 }
-// @ts-ignore
-export const getNotCompletedTasksEpic: Epic<ReturnType<tasksActions.getNotCompletedTasks>, any, RootState> = (action$, state$) => {
+export const getNotCompletedTasksEpic: Epic<ReturnType<typeof tasksActions.getNotCompletedTasks>, any, RootState> = (action$, state$) => {
     return action$.pipe(
         ofType('GET_NOT_COMPLETED_TASKS'),
         mergeMap(action =>
@@ -41,11 +40,12 @@ export const getNotCompletedTasksEpic: Epic<ReturnType<tasksActions.getNotComple
             }).then((res) => res.json())
                 .then(result => tasksActions.setTasks(result.data.tasks.notCompletedTasks as ITask[])))
         )
-    );
+    )
 }
-function CheckDueDate(task: TaskInputType) : string{
-    if(task.dueDate == ''){
-       let str = `
+
+function CheckDueDate(task: TaskInputType): string {
+    if (task.dueDate == '') {
+        let str = `
                         mutation CreateTask{
                                tasksMutations{
                                   createTask(task:{taskName:"${task.taskName}", categoryId: ${task.categoryId}, dueDate: null}){
@@ -60,9 +60,8 @@ function CheckDueDate(task: TaskInputType) : string{
                     }
 `
         return str;
-    }
-    else {
-       let str =   `
+    } else {
+        let str = `
                         mutation CreateTask{
                                tasksMutations{
                                   createTask(task:{taskName:"${task.taskName}", categoryId: ${task.categoryId}, dueDate: "${task.dueDate}"}){
@@ -79,9 +78,9 @@ function CheckDueDate(task: TaskInputType) : string{
         return str;
     }
 }
-// @ts-ignore
-export const addTaskEpic: Epic<ReturnType<tasksActions.fetchCreateTask>, any, RootState> = (action$, state$) => {
-     return action$.pipe(
+
+export const addTaskEpic: Epic<ReturnType<typeof tasksActions.fetchCreateTask>, any, RootState> = (action$, state$) => {
+    return action$.pipe(
         ofType('FETCH_CREATE_TASK'),
         mergeMap(action =>
             from(fetch('https://localhost:44303/graphql', {
@@ -95,22 +94,21 @@ export const addTaskEpic: Epic<ReturnType<tasksActions.fetchCreateTask>, any, Ro
                 }
             ).then(res => res.json())
                 .then(result => tasksActions.addTask(result.data.tasksMutations.createTask as ITask)))
-            )
         )
+    )
 }
 
-// @ts-ignore
-export const fetchSetTaskDoneEpic: Epic<ReturnType<tasksAction.fetchSetTaskDone>, any, RootState> = (action$, state$) => {
+export const fetchSetTaskDoneEpic: Epic<ReturnType<typeof tasksActions.fetchSetTaskDone>, any, RootState> = (action$, state$) => {
     return action$.pipe(
         ofType('FETCH_SET_TASK_DONE'),
         mergeMap(action =>
-        from(fetch('https://localhost:44303/graphql',{
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                query: `
+            from(fetch('https://localhost:44303/graphql', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    query: `
                 mutation UpdateTask{
                           tasksMutations{
                              updateTask(taskId: ${action.payload}){
@@ -121,17 +119,20 @@ export const fetchSetTaskDoneEpic: Epic<ReturnType<tasksAction.fetchSetTaskDone>
                                              }
                                           }
                                             `
-            })
-        }).then(res => res.json())
-            //.then(result => tasksActions.taskSetDone(action.payload, result.data.tasksMutations.updateTask.doneDate)))))
-            .then(result => console.log(result)))))
+                })
+            }).then(res => res.json())
+                .then(result => tasksActions.taskSetDone({
+                    taskId: action.payload,
+                    date: result.data.tasksMutations.updateTask.doneDate
+                })))))
+    //.then(result => console.log(result)))))
 }
 
-// @ts-ignore
-export const fetchRemoveTaskEpic: Epic<ReturnType<taskActions.fetchRemoveTask>,any,RootState> = (action$, state$) => {
-    return action$.pipe(ofType('FETCH_REMOVE_TASK'),
+export const fetchRemoveTaskEpic: Epic<ReturnType<typeof tasksActions.fetchRemoveTask>, any, RootState> = (action$, state$) => {
+    return action$.pipe(
+        ofType('FETCH_REMOVE_TASK'),
         mergeMap(action =>
-            from(fetch('https://localhost:44303/graphql',{
+            from(fetch('https://localhost:44303/graphql', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -145,15 +146,15 @@ export const fetchRemoveTaskEpic: Epic<ReturnType<taskActions.fetchRemoveTask>,a
                      }
                      `
                 })
-            }).then(res => console.log(res))
+            }).then(res => res.json())
                 .then(result => tasksActions.removeTask(action.payload)))))
 }
-function compareDates(task: ITask){
+
+function compareDates(task: ITask) {
     let dueDate = '';
-    if(task.dueDate == null){
+    if (task.dueDate == null) {
         dueDate = "null"
-    }
-    else{
+    } else {
         dueDate = `"${task.dueDate}"`
     }
     return `
@@ -174,20 +175,21 @@ function compareDates(task: ITask){
                      }
     `
 }
-// @ts-ignore
-export const editTaskEpic: Epic<ReturnType<tasksActions.fetchEditTask>,any,RootState> = (action$, state$) => {
+
+export const editTaskEpic: Epic<ReturnType<typeof tasksActions.fetchEditTask>, any, RootState> = (action$, state$) => {
+    console.log('I`m Here');
     return action$.pipe(
         ofType('FETCH_EDIT_TASK'),
         mergeMap(action =>
-            from(fetch('https://localhost:44303/graphql',{
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                query: compareDates(action.payload)
-            })
-        }).then(res => res.json())
+            from(fetch('https://localhost:44303/graphql', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    query: compareDates(action.payload)
+                })
+            }).then(res => res.json())
                 .then(result => tasksActions.editTask(result.data.tasksMutations.editTask))))
     )
 }

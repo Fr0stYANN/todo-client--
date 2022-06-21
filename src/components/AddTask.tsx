@@ -1,47 +1,42 @@
 import React, {ChangeEvent, FormEvent, useState} from 'react';
 import {useAppDispatch, useAppSelector} from "../hooks/redux";
-import {ITask} from "../models/ITask";
 import {ICategory} from "../models/ICategory";
 import {tasksActions} from '../store/actions'
 import {TaskInputType} from "../models/TaskInputType";
-import moment from "moment";
-const initialState : TaskInputType = {
+
+const initialState: TaskInputType = {
     taskName: '',
     dueDate: '',
     categoryId: 0
 }
 const validationStyle = {
-    color:'red',
+    color: 'red',
     textAlign: 'center',
-    display:'none'
+    display: 'none'
 } as React.CSSProperties;
 const AddTask = () => {
     const dispatch = useAppDispatch();
     const [taskState, setTaskState] = useState<TaskInputType>(initialState);
     const [validationStyles, setValidationStyles] = useState<React.CSSProperties>(validationStyle);
-    let categories : ICategory [] = useAppSelector(state => state.categories['categories']);
+    let categories: ICategory [] = useAppSelector(state => state.categories['categories']);
     const renderedCategories = categories.map(category => (
         <option value={category.categoryId} key={category.categoryId}>{category.categoryName}</option>
     ))
-    function randomNumber() {
-        let number = Math.floor(Math.random()*100000);
-        console.log(number)
-        return number;
-    }
-    function handleChange(event: ChangeEvent<HTMLInputElement>) : void {
+
+    function handleChange(event: ChangeEvent<HTMLInputElement>): void {
         console.log(taskState);
-        const {name , value} = event.target;
+        const {name, value} = event.target;
         setTaskState({...taskState, [name]: value});
     }
-    function handleSubmit(e: FormEvent<HTMLFormElement>) : void{
+
+    function handleSubmit(e: FormEvent<HTMLFormElement>): void {
         e.preventDefault();
-        if(taskState.taskName === ''){
-            setValidationStyles({...validationStyles, display:'block'});
-        }
-        else {
-            setValidationStyles({...validationStyles, display:'none'});
+        if (taskState.taskName === '') {
+            setValidationStyles({...validationStyles, display: 'block'});
+        } else {
+            setValidationStyles({...validationStyles, display: 'none'});
             setTaskState({...taskState})
-            if(taskState.dueDate === ''){
+            if (taskState.dueDate === '') {
                 setTaskState({...taskState, dueDate: null})
             }
             dispatch(
@@ -50,16 +45,18 @@ const AddTask = () => {
             setTaskState(initialState);
         }
     }
-    function handleSelectChange(e: ChangeEvent<HTMLSelectElement>) : void{
+
+    function handleSelectChange(e: ChangeEvent<HTMLSelectElement>): void {
         const {value} = e.target;
         setTaskState({
             ...taskState,
-            categoryId : Number(value)
+            categoryId: Number(value)
         })
     }
+
     return (
         <div>
-            <h1>Add Task</h1>
+            <h2>Add Task</h2>
             <div className="add-task-form">
                 <form onSubmit={handleSubmit}>
                     <label htmlFor="taskName">Task Name:</label>
@@ -76,8 +73,7 @@ const AddTask = () => {
                         type="datetime-local"
                         name="dueDate"
                         id="dueDate"
-                        // @ts-ignore
-                        value = {taskState?.dueDate.toString()}
+                        value={taskState?.dueDate as string}
                         onChange={handleChange}
                     />
                     <label htmlFor="categoryId">Category:</label>
